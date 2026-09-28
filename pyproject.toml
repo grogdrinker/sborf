@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sborf"
+version = "0.1.0"
+description = "A neural network that predicts and designs alternative DNA encodings for proteins, aiming to fine-tune their expression"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Gabriele Orlando", email = "gabriele.orlando@umontpellier.fr" }]
+dependencies = [
+    "torch",
+    "numpy",
+    "scikit-learn",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+[project.urls]
+Homepage = "https://github.com/grogdrinker/sborf"
+
+[project.scripts]
+sborf = "sborf.sborf_standalone:main"
+
+[tool.setuptools]
+packages = ["sborf", "sborf.src"]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.package-data]
+sborf = ["models/*/*.m"]
