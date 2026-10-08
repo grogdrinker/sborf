@@ -149,65 +149,6 @@ are different at every run. To check them, predict their expression like in step
 sborf optimized.fasta --organism cerevisiae
 ```
 
-## Using SBORF from Python
-
-The same steps in a Python script (run it from the folder that contains this `README.md`):
-
-```python
-from sborf.src import parse
-from sborf.sborf_standalone import modify_sequences, quality_check_DNASeq
-from sborf.predict import run_prediction
-from sborf.explain import run_explaination
-from sborf.optimize import optimize
-
-# predict: {sequence id: cDNA} -> {sequence id: score between 0 and 1}
-sequences = modify_sequences(parse.leggifasta("examples/example_cdna.fasta"))
-quality_check_DNASeq(sequences)   # stops with an explanatory message if a sequence is not valid cDNA
-scores = run_prediction(sequences, organism="cerevisiae")
-for name, score in scores.items():
-    print(name, round(score, 3))
-
-# explain: {sequence id: one value between -1 and 1 for every codon}
-per_codon = run_explaination(sequences, organism="cerevisiae")
-for name, values in per_codon.items():
-    print(name, len(values), "codons, min %.2f, max %.2f" % (min(values), max(values)))
-
-# optimize: protein -> list of cDNA sequences, best first
-protein = parse.leggifasta("examples/example_protein.fasta")["YDR045C"]
-designs = optimize(protein, organism="cerevisiae", iterations=20, pop_size=200,
-                   num_parents_mating=50, num_optimized_seqs=2)
-scores = run_prediction(dict(enumerate(designs)), organism="cerevisiae")
-for i, dna in enumerate(designs):
-    print("design", i, len(dna), "nucleotides, predicted score", round(scores[i], 3))
-```
-
-Its output (the designs and their scores change at every run):
-
-```
-YOR012W 0.399
-YHR059W 0.599
-YOR012W 137 codons, min -1.00, max 0.34
-YHR059W 130 codons, min -1.00, max 1.00
-design 0 330 nucleotides, predicted score 0.889
-design 1 330 nucleotides, predicted score 0.876
-```
-
-`modify_sequences` prepares the sequences (upper case, removes a stop codon at the end) and
-`quality_check_DNASeq` validates them. `run_prediction` and `run_explaination` expect sequences prepared
-in this way: cDNA in upper case, a length that is a multiple of 3, and no stop codon.
-
-## Contents of the package
-
-```
-sborf/
-  sborf_standalone.py   the `sborf` command
-  predict.py            run_prediction
-  explain.py            run_explaination
-  optimize.py           optimize
-  src/                  neural network, parsing and output code
-  models/               trained models of the three organisms
-```
-
 ## License
 
 Apache License 2.0, see `LICENSE`.
